@@ -26,7 +26,7 @@ router.post("/api/v1/users/login", async (req, res) => {
 
     const token = await user.generateAuthToken();
 
-    res.send({ user, token });
+    res.send({ user: user.getPublicProfile(), token });
   } catch (e) {
     res.status(400).send(e);
   }
