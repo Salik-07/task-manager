@@ -7,7 +7,11 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 app.use((req, res, next) => {
-  res.status(503).send("Site is currently down. Check back soon!");
+  if (req.method === "GET") {
+    res.send("GET requests are disabled.");
+  } else {
+    next();
+  }
 });
 
 app.use(express.json());
