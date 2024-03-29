@@ -3,7 +3,7 @@ const Task = require("../models/task");
 
 const router = new express.Router();
 
-router.post("/tasks", async (req, res) => {
+router.post("/api/v1/tasks", async (req, res) => {
   const task = new Task(req.body);
 
   try {
@@ -15,7 +15,7 @@ router.post("/tasks", async (req, res) => {
   }
 });
 
-router.get("/tasks", async (req, res) => {
+router.get("/api/v1/tasks", async (req, res) => {
   try {
     const tasks = await Task.find();
 
@@ -25,7 +25,7 @@ router.get("/tasks", async (req, res) => {
   }
 });
 
-router.get("/tasks/:id", async (req, res) => {
+router.get("/api/v1/tasks/:id", async (req, res) => {
   const _id = req.params.id;
 
   try {
@@ -41,7 +41,7 @@ router.get("/tasks/:id", async (req, res) => {
   }
 });
 
-router.patch("/tasks/:id", async (req, res) => {
+router.patch("/api/v1/tasks/:id", async (req, res) => {
   const updates = Object.keys(req.body);
   const allowedUpdates = ["description", "completed"];
   const isValidOperation = updates.every((update) =>
@@ -53,14 +53,14 @@ router.patch("/tasks/:id", async (req, res) => {
   }
 
   try {
-    const task = await Task.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
+    const task = await Task.findById(req.params.id);
 
     if (!task) {
       return res.status(404).send();
     }
+
+    updates.forEach((update) => (task[update] = req.body[update]));
+    await task.save();
 
     res.send(task);
   } catch (e) {
@@ -68,7 +68,7 @@ router.patch("/tasks/:id", async (req, res) => {
   }
 });
 
-router.delete("/tasks/:id", async (req, res) => {
+router.delete("/api/v1/tasks/:id", async (req, res) => {
   try {
     const task = await Task.findByIdAndDelete(req.params.id);
 

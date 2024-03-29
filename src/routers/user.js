@@ -3,7 +3,7 @@ const User = require("../models/user");
 
 const router = new express.Router();
 
-router.post("/users", async (req, res) => {
+router.post("/api/v1/users", async (req, res) => {
   const user = new User(req.body);
 
   try {
@@ -15,7 +15,7 @@ router.post("/users", async (req, res) => {
   }
 });
 
-router.get("/users", async (req, res) => {
+router.get("/api/v1/users", async (req, res) => {
   try {
     const users = await User.find({});
 
@@ -25,7 +25,7 @@ router.get("/users", async (req, res) => {
   }
 });
 
-router.get("/users/:id", async (req, res) => {
+router.get("/api/v1/users/:id", async (req, res) => {
   const _id = req.params.id;
 
   try {
@@ -41,7 +41,7 @@ router.get("/users/:id", async (req, res) => {
   }
 });
 
-router.patch("/users/:id", async (req, res) => {
+router.patch("/api/v1/users/:id", async (req, res) => {
   const updates = Object.keys(req.body);
   const allowedUpdates = ["name", "email", "password", "age"];
   const isValidOperation = updates.every((update) =>
@@ -53,14 +53,14 @@ router.patch("/users/:id", async (req, res) => {
   }
 
   try {
-    const user = await User.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
+    const user = await User.findById(req.params.id);
 
     if (!user) {
       return res.status(404).send();
     }
+
+    updates.forEach((update) => (user[update] = req.body[update]));
+    await user.save();
 
     res.send(user);
   } catch (e) {
@@ -68,7 +68,7 @@ router.patch("/users/:id", async (req, res) => {
   }
 });
 
-router.delete("/users/:id", async (req, res) => {
+router.delete("/api/v1/users/:id", async (req, res) => {
   try {
     const user = await User.findByIdAndDelete(req.params.id);
 
