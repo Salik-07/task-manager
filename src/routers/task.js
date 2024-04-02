@@ -21,19 +21,11 @@ router.post("/api/v1/tasks", auth, async (req, res) => {
 
 router.get("/api/v1/tasks", auth, async (req, res) => {
   try {
-    // 1. Taken a user and find their tasks
     await req.user.populate({
       path: "tasks",
     });
+
     res.send(req.user.tasks);
-
-    // 2. Taken a task and find the user who created task
-    // const tasks = await Task.find({ owner: req.user._id }).populate({
-    //   path: "owner",
-    //   select: "name",
-    // });
-
-    // res.send(tasks);
   } catch (e) {
     res.status(500).send();
   }
