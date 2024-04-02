@@ -19,6 +19,9 @@ router.post("/api/v1/tasks", auth, async (req, res) => {
   }
 });
 
+// GET /tasks?completed=true
+// GET /tasks?limit=10&skip=20
+// GET /tasks?sortBy=createdAt:desc
 router.get("/api/v1/tasks", auth, async (req, res) => {
   const match = {};
 
@@ -30,6 +33,10 @@ router.get("/api/v1/tasks", auth, async (req, res) => {
     await req.user.populate({
       path: "tasks",
       match,
+      options: {
+        limit: parseInt(req.query.limit),
+        skip: parseInt(req.query.skip),
+      },
     });
 
     res.send(req.user.tasks);
